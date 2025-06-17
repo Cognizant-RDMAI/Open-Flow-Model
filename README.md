@@ -190,7 +190,7 @@ A temporary directory used solely by MLflow while storing artifacts like `.json`
 Due to the inherent time varying of the challenges addressed in this project, it is important to continuously re-train and fine-tune the model to make sure it is up to date with the latest trends and variances of our climate and environment. The model was trained on publicly available data up to 2015. In the future, the model may not reflect updated scientific understandings, environmental conditions, or regulatory standards.
 
 ## Disclaimer
-River Deep Mountain AI (“RDMAI”) is run by a collection of UK water companies and their technology partners. The entities currently participating in RDMAI are listed at the end of this section and they are collectively referred to in these terms as the “consortium”.
+River Deep Mountain AI (“RDMAI”) consists of 10 parties. The parties currently participating in RDMAI are listed at the end of this section and they are collectively referred to in these terms as the “consortium”.
 
 This section provides additional context and usage guidance specific to the artificial intelligence models and / or software (the “**Software**”) distributed under the MIT License. It does not modify or override the terms of the MIT License.  In the event of any conflict between this section and the terms of the MIT licence, the terms of the MIT licence shall take precedence.
 
@@ -231,16 +231,17 @@ Users assume full responsibility for their use of the Software, validating the S
 
 #### 6. Consortium Members  
  
-1. Anglian Water Services Limited 
-2. Southwest Water Limited 
-3. Northern Ireland Water 
-4. Wessex Water Limited
-5. The Rivers Trust
-6. RSK ADAS Limited
-7. Water Research Centre Limited
-8. Xylem
-9. Northumbrian Water Limited
-10. Cognizant Worldwide Limited
+1. Northumbrian Water Limited
+2. Cognizant Worldwide Limited
+3. Xylem
+4. Water Research Centre Limited
+5. RSK ADAS Limited
+6. The Rivers Trust
+7. Wessex Water Limited
+8. Northern Ireland Water
+9. Southwest Water Limited
+10. Anglian Water Services Limited
+
 
 
 
