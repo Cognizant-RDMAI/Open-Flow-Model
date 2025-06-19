@@ -1,0 +1,23 @@
+# Core Libraries
+numpy==1.24.4
+pandas==2.2.3
+geopandas==1.0.1
+
+# Machine Learning & Data Processing
+scikit-learn==1.6.1
+tensorflow==2.11.0
+keras==2.11.0
+mlflow==2.21.3
+
+# Data Visualization
+missingno==0.5.2
+matplotlib==3.10.0
+matplotlib-venn==1.1.2
+seaborn==0.13.2
+contextily==1.6.2
+
+# Utilities
+requests==2.32.3
+python-dotenv==1.1.0
+inequalipy==1.0.5
+tqdm==4.67.1
