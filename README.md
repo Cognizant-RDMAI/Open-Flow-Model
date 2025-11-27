@@ -11,6 +11,10 @@ However, gauged flow data are often sparse or entirely missing, especially in sm
 
 To address these data gaps, hydrologists often rely on surrogate data from comparable catchments, deterministic hydrology models, or conduct expensive field campaigns. These approaches, while useful, are limited in scalability and timeliness.
 
+### Report Download:
+
+Please download the Open Flow Model Report [here](https://github.com/Cognizant-RDMAI/BB1A-River-Flow-Estimation-In-Ungauged-Catchments/blob/main/Open%20Flow%20Model%20Report.pdf).
+
 ### Objective
 The Open Flow Model aims to estimate daily mean river flow $(m^3/s)$ in ungauged catchments using a machine learning approach that leverages both static and dynamic data sources. 
 
@@ -24,167 +28,78 @@ The model, and its associated performance metrics, presented in this report, rep
 
 The project consists of 6 core partners: Northumbrian Water, Cognizant Ocean, Xylem Inc, Water Research Centre Limited, The Rivers Trust and ADAS. The project is further supported by 6 water companies across the United Kingdom and Ireland. 
 
-## Repo structure
-To enhance understandability of the way the project has been structured, there are different directories implicitly explaining the logic to arrange files related to data, notebooks, configurations, and so on. However, after running the first notebooks, developers can find some `.pkl` files in this main directory as they store information that need (or it is more convenient) to be shared among the different steps of the analysis.
+## Installation and Setup
 
-### `datasets`
-Here the list of the datasets used within the project, with a brief description:
- - **[CAMELS-GB](https://catalogue.ceh.ac.uk/documents/8344e4f3-d2ea-44f5-8afa-86d2987543a9)**: A comprehensive dataset of catchment attributes across Great Britain
- - **[Hydrology Data Explorer API](https://environment.data.gov.uk/hydrology/landing)**: Provides flow flags and other hydrological indicators
- - **[Chalk Streams List](https://naturalengland-defra.opendata.arcgis.com/datasets/Defra::chalk-rivers-england/about)**: Identifies unique geological catchments with presence of chalk. Dataset from Natural England. 
+This guide provides detailed instructions for setting up the project environment and preparing the necessary data.
 
-In terms of availability of the data please note that for:
- - **CAMELS-GB**, developers can refer to the [Installation Guide](INSTALL.md) for all the details and reference to the documentation provided by the provider
- - **Hydrology Data Explorer API**: data queries via API are made at runtime, so there is no need to provide these information before running the notebooks
- - **Chalk Streams List**: developers can refer to the [Installation Guide](INSTALL.md) for all the details
+### 1. Clone the Repository
 
-### `notebooks`
-Notebooks drive the development of the project.
+First, you need to clone this repository to your local machine. If you are new to Git, you can do this by opening a terminal and running the following command:
 
-Currently, all the code is nested in the notebooks, and there are no functions defined in any `.py` files or customized packages, except for the file `util_IO.py`, containing utility functions used throughout the notebooks.
+```bash
+git clone https://github.com/Cognizant-RDMAI/Open-Flow-Model.git
+cd Open-Flow-Model
+```
 
-The flow of the analysis is straightforward to follow, as the notebooks are numbered (i.e., every 
-notebook starts with the name of the step: `01`, `02`, etc..).
+This will download the project into a new folder named `Open-Flow-Model` and navigate you into it.
 
-The below description details what developers should expect:
+### 2. Install Poetry
 
-#### Step 1 - Aggregation of data files
-The first step, as the notebook name suggests, is all about aggregating the raw, original data into different files.
+This project uses Poetry for dependency management. You can install it by following the official instructions [here](https://python-poetry.org/docs/#installation).
 
-There are two main sets of variables which are considered:
-- **Attributes**: these are static variables or variables that change over relative long periods of time describing the location where the sensor is located, such as soil, topography, land cover, etc.
-- **Time series**: these are continuous dynamic variables, such as climate variables, as well as 
-the ***label*** (variable to simulate), which for this model is `discharge_vol`.
+### 3. Install Project Dependencies
 
-Briefly, the notebook performs the following:
-- For each set of variables (attributes or time series), the aggregation process consists of:
-   1. Definition of the fields/rows of interest.
-   2. Aggregation of files.
-   3. Storing of the aggregated file, as well as further metadata, if required.
-- The metadata used during the data aggregation is defined and stored as `.pkl` files (in the main project directory).
+Navigate to the project's root directory and run the following command to install the required packages:
 
-However, given the structure of the data files, the aggregation process has some nuances:
- - **Attributes**, the aggregation process consists of a stream of tables joined by the table index . Therefore, direction of expansion is  **horizontal**.
- 
-    Regarding field selection, there are currently only two aggregation lists, leading to the creation of: 
-      - `full_list_of_fields`: containing the full set of available fields in the original dataset.
-      - `fundamental`: excluding fields which are calculated/derived from the other fields already present in the CAMELS-GB.
-   
-   Although not initially included into CAMELS-GB, **Chalk Streams List** is easily integrated into the overall attributes dataset by adding the correspondent data frame to the dictionary. 
-   
-   In addition, developers can easily add further aggregation logics by creating a new dictionary with the list of fields to include for each table; they also may want to create a function doing that, to avoid code repetition, as the dictionary would be the only differing input.
- 
- - **Time series**, the aggregation process consists of a stream of table concatenation. Therefore, the direction of expansion is **vertical**. While all fields are retained in this step, the data aggregated into rows are subject to some manipulation. Below is a description of the main stages of processing for each data file:
-   - The **catchment ID** is extracted from the file name.
-   - Values of the time series are ingested from each file. However, the model simulated flow is then flanked by the corresponding extracted observed flow via the **Hydrology Data API** only in the presence of flags `Good` and `Complete`. This means that, for flow only, the procedure aims to substitute values from CAMELS-GB with values obtained from the Hydrology Data API. A consequence of the intrinsic check of simulated flow quality is a **discontinuous time series**. However, since several catchments have `null` values for flow, even within the CAMELS-GB dataset, there is no avoiding the need to deal with discontinuous time series.
-   - **Catchment ID** is replicated to the whole time series as new column.
-   - Data is attached to the block.
+```bash
+poetry install
+```
 
-   The block is finally saved, as well as a dictionary containing the time ranges for each catchment ID, and logs from the aggregation.
- 
- 
- #### Step 2 - Exploratory Data Analysis
-The second step is the exploratory data analysis. This step consists of several notebooks, each one focused on a specific purpose:
+This will create a virtual environment and install all the dependencies listed in the `pyproject.toml` file.
 
-  - **02a-EDA-Attributes-Geo.ipynb**: visualisation of gauge station locations, and catchments areas in the entire dataset.
- 
-    This notebook also contains a section in which developers can specify a set of catchments for visualisation. This functionality serves diverse purposes: developers can return to this point and assess locations, without disrupting the code workflow. 
-    
-    Finally, there is a section that facilitates a cross check between `area` calculated using the polygons and the area attribute available within the CAMELS-GB. 
+### 4A. Prepare Data and Run Inference (RECOMMENED AS NO MODEL TRAINING REQUIRED)
 
- - **02a-EDA-Attributes.ipynb**: analysis regarding attributes.
-    
-    Please note: most of the visualisation here has been performed using `ProfileReport` from package `ydata_profiling`. Unfortunately, due to conflicts with the other packages, this package has not been included in the libraries requirement list ([Libraries requirements](INSTALL.md#libraries-requirements)) as it is not production-ready. For this reason `import ydata_profiling` does not occur at the beginning of the notebook, or anywhere else, except in that specific chunk of code. Nevertheless, to replicate what done, developers can create a specific Python environment in which the package `ydata_profiling`is installed, or use another package, while ensuring that the `attributes_html_report_flag` flag is enabled.
+To prepare the data and run an inference example, you need to execute a sequence of notebooks located in the `notebooks/` directory. This process downloads the required datasets, processes them, and demonstrates how to use the trained model.
 
-    Analyses possible in the notebook include: 
-     - Missing values analysis.
-     - Linear correlation matrix analysis.
+1.  **Run `01-DataDownload.ipynb`**: Downloads the CAMELS-GB dataset and extracts it to `datasets/camels-gb/data`. Takes about 5 mins on M1 MAC.
+2.  **Run `02-DataAggregation.ipynb`**: Aggregates the raw data into unified files.  Takes about 60 mins on M1 MAC.
+3.  **Run `03-DataTrim.ipynb`**: Trims the dataset to remove irrelevant columns and rows with missing values. Takes about 2 mins on M1 MAC.
+4.  **Run `04-FeatureEnginnering.ipynb`**: Creates additional features for the model. Takes about 2 mins on M1 MAC.
+5.  **Run `05-DataSplit.ipynb`**: Splits the data into training and testing sets.  Ensure the parameter USE_EXISTING_TRAIN_TEST_SPLIT_FOR_LOCAL_MODEL = True. Takes about 180 mins on M1 MAC.
+6.  **Run `07-Inference.ipynb`**: Picks up model in the repo and demonstrates how to use the trained model for inference on new data. Takes about 1 mins on M1 MAC.
 
- - **02b-EDA-Timeseries.ipynb**: analysis of time series.
-    
-    First chunks of code creates chart for each continuous time series among all the catchments, stored as `.png` in `resources\EDA\timeseries`.
+### 4B. Prepare Data, train new model and Run Inference
 
-    Further analyses include:
-      - The distribution of the time series length.
-      - Linear correlation matrix among time series values.
-      - An investigation of the max number of consecutive rainy days.
-      - Missing values analysis.
-      - Generation of a table of percentiles of flow (label), grouped-by catchment.
-      - Investigation of the quantity of zeros (0s); this has driven development toward the utilisation of the Hydrology Data API's `Good` and `Complete` flags.
-      - A comparison of zero values between flow data from CAMELS-GB and the Hydrology Data API.
-      - Generation of a histogram of flow distribution.
+To prepare the data, train the model, and run an inference example, you need to execute a sequence of notebooks located in the `notebooks/` directory. This process downloads the required datasets, processes them, and demonstrates how to use the trained model.
 
- - **02c-EDA-Timeseries&Attributes.ipynb**: aggregation of attributes and time series.
+1.  **Run `01-DataDownload.ipynb`**: Downloads the CAMELS-GB dataset and extracts it to `datasets/camels-gb/data`.
+2.  **Run `02-DataAggregation.ipynb`**: Aggregates the raw data into unified files.
+3.  **Run `03-DataTrim.ipynb`**: Trims the dataset to remove irrelevant columns and rows with missing values.
+4.  **Run `04-FeatureEnginnering.ipynb`**: Creates additional features for the model.
+5.  **Run `05-DataSplit.ipynb`**: Splits the data into training and testing sets. Ensure the parameter USE_EXISTING_TRAIN_TEST_SPLIT_FOR_LOCAL_MODEL = False.
+6.  **Run `06-ModelTraining.ipynb`**: Trains the model using the prepared data.
+7.  **Run `07-Inference.ipynb`**: Picks up newly trained model and demonstrates how to use the trained model for inference on new data.
 
-    After merging the two datasets, the analyses performed in the notebook include:
-     - A scatter plot of `flows` vs. `area`, while considering average precipitation of the previous 5, 15, and 30 days.
-     - An analysis of `area` in catchments with a significant percentage of 0 flows.
+### 5. Manually Download Chalk Streams List
 
- - **02d-EDA-DataTrim.ipynb**: performs columns/feature and row selection, mainly based on availability of data (i.e., missing values).
+The Chalk Streams dataset must be downloaded manually.
 
-    More specifically, the notebook:
-    - Removes attributes columns with too many `null` values.
-    - Removes time series columns considered not relevant for the model.
-    - Removes rows where at least one attribute is `null`.
-    - Corrects miss-alignment between catchment attributes and time series due to the Hydrology Data API operation. 
-  
-    Please note: this is the only notebook, within step 2, that modifies the datasets by reducing/trimming data.
+1.  Download the **Chalk Rivers (England)** dataset from the [Natural England Open Data Geoportal](https://naturalengland-defra.opendata.arcgis.com/datasets/Defra::chalk-rivers-england/about).
+2.  Use a GIS tool to identify monitoring points that fall on chalk streams.
+3.  Create a `.csv` file named `chalk_streams.csv` in the `datasets` directory with two columns: `gauge_id` and `chalk_stream_flag`.
 
-#### Step 3 - Feature Engineering
-This step performs all processes needed to obtain a dataset which can be directly fed into the machine learning models.
+## Folder Structure
 
- - **03a-FE_AdditionalFeatures.ipynb**: following the schema adopted across the entire project, performs feature engineering, including differentiation between **attributes** and **timeseries** datasets, more specifically: 
-    - **Attributes**:
-      - Non-numerical information describing gauge locations are extracted and stored in a specific data frame within the aggregated attributes data directory.
-      - the *gauge_name* field has been split into two fields, namely *river* and *location*, detached, and saved as separated table.
-    - **Timeseries**: A few additional fields have been added to timeseries datasets to provide a time reference during the model training phase, including:
-      - `sin_year` and `cos_year`, calculated by setting the 21st of March as 0 $\pi$, and transforming the dates information via a trigonometric function (*sin* and *cos*) with 2 $\pi$ representing one year.
-      - `time_ref`, integer calculated as the difference in days from the timeseries dates and the oldest date available in the whole dataset.
- 
-    In addition, a logarithmic transformation has been added as potential label to use.
+- **datasets**: Contains raw, intermediate, and processed data used in the project.
+- **models**: Contains trained machine learning models.
+- **notebooks**: Contains Jupyter notebooks for data exploration, feature engineering, model training, and inference.
+- **resources**: Contains supplementary materials such as charts and spreadsheets.
+- **src**: Contains Python source code for data preparation and utility functions.
+- **tests**: Contains unit tests for the source code.
 
-    Please note: a section at the end of this notebook performs cluster analysis. Only attribute fields have been considered, since the use of `t-SNE`. However, developers may want to enhance the cluster analysis in this section as this notebook generates the final data frames that are fed into the model. Developers may want to use the cluster analysis to:
-    - Implement an alternative approach to delineating catchments, which can be useful for the definition of alternative train/test datasets.
-    - Add/substitute dimensions to the model.
-
- - **03b-FE_ModelFeed.ipynb**: implements the second sub-step to produce data that directly feeds into the machine learning models. Here, continuous **time series** data coming from different sensors are broken up into time windows, while maintaining a coherent **attributes** dataset:
-    - **Timeseries**:
-      - After grouping by `catchmentID` and `group`, time windows of continuous timeseries are broken up into windows of a certain length.
-      - Windows of the different sensor data are aggregated.
-      - Explanatory variables are scaled.
-      - Explanatory variables and labels for the training set only are shuffled (test set is excluded as the shuffle would be irrelevant).
-    - **Attributes**:
-      - A registry data frame originating directly from the timeseries windowing function is merged  with the original data frame, with attributes. This produces a new dataset of static variables that are coherent with observations coming from windowing.
-      - Static variables are scaled.
-
-    While this notebook has a considerable set of parameters, they can all be found in the first chunks of code. When `example_input` flag is set to `True`, a dummy example is created which is useful for assessing what the routine is doing by looking at a very small sample of (random) data.
-
-#### Step 4 - Model training
-During model training, all metrics are collected and there us an in-depth analysis of model error. Due to the need to store a vast quantity of artifacts, **04-BaseModel.ipynb** uses MLflow experiments tracking capabilities.
-
-Overall, the notebook:
- - Loads the data coherently with the parameters chosen in the first chunks. 
- - Defines layers of the neural network as well as the loss function (developers may need to interact with this set of parameters too). 
- - Compiles the model. 
- - Creates TensorFlow datasets, to speed up the training. 
- - Trains the model.
- - Evaluates the model on the test set. 
- - Performs error analysis. 
-
-  Since the model can simulate flow or its logarithmic transformation, error analysis automatically calculates metrics based on "level" predictions , which may vary from the default metrics stored by MLflow, as these metrics are related to the pure training process. Error analyses available after the training include:
-   - Scatter plots of differences (all variables and zoom-in on MAE and MAPE), errors vs. actual. 
-   - Error concentration at catchment-level. 
-   - $R^2$/NSE at catchment level. 
-   - Identification of the most problematic catchments. 
-   - Maps showing good and bad catchments. 
-   - Graphs of actual and predicted time series, both for training and test datasets. 
-   - Generation of flow duration curves (*FDCs*) considering the distribution of actual and predicted time series, both for training and test datasets. 
-
-### `resources`
-The `resources` directory stores mainly artifacts that are not used in the training process, but still might provide value by being archived. The `resources` directory contains the  subdirectory `EDA`, which stores anything coming from step 2, as well as the subdirectory `chart`, which currently is only used in step 3.
-
-### `temp`
-A temporary directory used solely by MLflow while storing artifacts like `.json` or `.csv` files.
+###
+Compute instance used for development
+64 vCPUs, 416 GB RAM	NVIDIA T4 x 4
 
 ### Inherent time varying
 Due to the inherent time varying of the challenges addressed in this project, it is important to continuously re-train and fine-tune the model to make sure it is up to date with the latest trends and variances of our climate and environment. The model was trained on publicly available data up to 2015. In the future, the model may not reflect updated scientific understandings, environmental conditions, or regulatory standards.
@@ -233,7 +148,7 @@ Users assume full responsibility for their use of the Software, validating the S
  
 1. Northumbrian Water Limited
 2. Cognizant Worldwide Limited
-3. Xylem
+3. Xylem Water Solutions UK Limited
 4. Water Research Centre Limited
 5. RSK ADAS Limited
 6. The Rivers Trust

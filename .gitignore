@@ -1,14 +1,15 @@
 # Project Specific
-*.pkl
+/*.pkl
 
 
 datasets/camels-gb/data/*.csv
 datasets/camels-gb/data/*/*
 
 datasets/camels-gb-aggregated/*.pkl
+datasets/camels-gb-aggregated/validation_data/*.pkl
 datasets/camels-gb-aggregated/attributes/*.csv
 datasets/camels-gb-aggregated/timeseries/*.csv
-datasets/*.csv
+#datasets/*.csv
 
 
 resources/EDA/attributes/*.html
