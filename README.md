@@ -15,6 +15,14 @@ To address these data gaps, hydrologists often rely on surrogate data from compa
 
 Please download the Open Flow Model Report [here](https://github.com/Cognizant-RDMAI/Open-Flow-Model/tree/main/supporting-documents).
 
+### Benchmark Download:
+
+River Deep Mountain AI models have been independently benchmarked by WRc and ADAS, against existing industry-standard tools. The benchmarking reports assess model performance, ‘ease-of-use’, time and cost requirements.Read the full report [here](https://github.com/Cognizant-RDMAI/Open-Flow-Model/tree/main/supporting-documents).
+
+### Whitepaper Download:
+
+Please download the Open Flow Model whitepaper [here](https://github.com/Cognizant-RDMAI/Open-Flow-Model/tree/main/supporting-documents).
+
 ### Objective
 The Open Flow Model aims to estimate daily mean river flow $(m^3/s)$ in ungauged catchments using a machine learning approach that leverages both static and dynamic data sources. 
 
