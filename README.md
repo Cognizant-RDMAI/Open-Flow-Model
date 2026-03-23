@@ -13,7 +13,7 @@ To address these data gaps, hydrologists often rely on surrogate data from compa
 
 ### Report Download:
 
-Please download the Open Flow Model Report [here](https://github.com/Cognizant-RDMAI/BB1A-River-Flow-Estimation-In-Ungauged-Catchments/blob/main/Open%20Flow%20Model%20Report.pdf).
+Please download the Open Flow Model Report [here](https://github.com/Cognizant-RDMAI/Open-Flow-Model/tree/main/supporting-documents).
 
 ### Objective
 The Open Flow Model aims to estimate daily mean river flow $(m^3/s)$ in ungauged catchments using a machine learning approach that leverages both static and dynamic data sources. 
